@@ -1,3 +1,4 @@
+import { Sidebar } from "@/components/dashboard/sidebar";
 import "@/global.css";
 export default async function Layout({
   children,
@@ -5,8 +6,11 @@ export default async function Layout({
   children: React.ReactNode;
 }) {
   return (
-    <section className="mt-20">
+    <div className="flex h-screen overflow-hidden">
+      <Sidebar />
+      <main className="flex-1 overflow-y-auto bg-background p-6 max-md:mt-20">
         {children}
-    </section>
+      </main>
+    </div>
   );
 }

@@ -1,3 +1,4 @@
+import { Car, Feature } from "@/lib/definitions"
 import { createClient } from "@supabase/supabase-js"
 
 // Verificar que las variables de entorno estén definidas
@@ -19,60 +20,6 @@ function getSupabase() {
     )
   }
   return supabase
-}
-
-// Definición de tipos
-export interface Car {
-  id: string
-  brand: string
-  model: string
-  variant?: string
-  condition: string
-  price: number
-  location?: string
-  year: number
-  mileage: number
-  body_type?: string
-  fuel: string
-  transmission?: string
-  environmental_tag?: string
-  drivetrain?: string
-  power?: number
-  engine_displacement?: number
-  color: string
-  doors?: number
-  electric_range?: number
-  battery_capacity?: number
-  charging_time?: number
-  fast_charge?: boolean
-  charging_port?: string
-  iva_deductible?: boolean
-  monthly_price?: number
-  finance_price?: number
-  description?: string
-  created_at?: string
-  // Campos virtuales para la UI
-  images?: string[]
-  features?: string[]
-}
-
-export interface CarImage {
-  id: string
-  car_id: string
-  image_url: string
-  created_at?: string
-}
-
-export interface Feature {
-  id: string
-  name: string
-  category?: string
-  created_at?: string
-}
-
-export interface CarFeature {
-  car_id: string
-  feature_id: string
 }
 
 // Función para subir una imagen a Supabase Storage

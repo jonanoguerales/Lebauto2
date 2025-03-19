@@ -1,32 +1,23 @@
-import { createClient } from "@/utils/supabase/server";
-import { InfoIcon } from "lucide-react";
-import { redirect } from "next/navigation";
+import { DashboardHeader } from "@/components/dashboard/dashboardHeader";
+import { StatsCards } from "@/components/dashboard/statsCards";
+import { SalesChart } from "@/components/dashboard/salesChart";
+import { VehicleDistributionChart } from "@/components/dashboard/vehicleDistributionChart";
+import { RecentVehicles } from "@/components/dashboard/recentVehicles";
 
-export default async function ProtectedPage() {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return redirect("/sign-in");
-  }
-
+export default function Home() {
   return (
-    <div className="flex-1 w-full flex flex-col gap-12">
-      <div className="w-full">
-        <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
-          <InfoIcon size="16" strokeWidth={2} />
-          Página protegida, solo visible para usuarios autenticados
-        </div>
+    <div className="space-y-6">
+      <DashboardHeader
+        title="Dashboard"
+        description="Resumen general de la gestión de vehículos"
+      />
+      <StatsCards />
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <SalesChart />
+        <VehicleDistributionChart />
       </div>
-      <div className="flex flex-col gap-2 items-start">
-        <h2 className="font-bold text-2xl mb-4">Detalles del usuario</h2>
-        <pre className="text-xs font-mono p-3 rounded border max-h-32 overflow-auto">
-          {JSON.stringify(user, null, 2)}
-        </pre>
-      </div>
+
+      <RecentVehicles />
     </div>
   );
 }

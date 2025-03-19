@@ -61,8 +61,21 @@ export interface FilterState {
   maxKm: number
 }
 
+export interface CarImage {
+  id: string
+  car_id: string
+  image_url: string
+  created_at?: string
+}
+
 export interface Feature {
   id: string
   name: string
   category?: string
+  created_at?: string
+}
+
+export interface CarFeature {
+  car_id: string
+  feature_id: string
 }
