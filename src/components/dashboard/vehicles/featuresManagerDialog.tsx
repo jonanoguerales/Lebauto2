@@ -16,7 +16,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { PlusCircle, Search } from "lucide-react";
 import { fetchFeatures, createFeature } from "@/supabase/supabase";
 import { Car, Feature } from "@/lib/definitions";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/useToast";
 
 interface FeaturesManagerDialogProps {
   open: boolean;

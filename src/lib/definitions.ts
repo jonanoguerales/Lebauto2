@@ -78,3 +78,42 @@ export interface CarFeature {
   car_id: string
   feature_id: string
 }
+export interface FiltersData {
+  brand?: string[];
+  model?: string[];
+  color?: string[];
+  fuel?: string[];
+  location?: string[];
+  minPrice?: number;
+  maxPrice?: number;
+  minYear?: number;
+  maxYear?: number;
+  minKm?: number;
+  maxKm?: number;
+};
+
+// Claves que son array de string
+type ArrayFilterKey = "brand" | "model" | "fuel" | "location" | "color";
+
+// Claves que son numéricas
+type NumberFilterKey = "minPrice" | "maxPrice" | "minYear" | "maxYear" | "minKm" | "maxKm";
+
+// Union de todas las claves
+type FilterKey = ArrayFilterKey | NumberFilterKey;
+
+export interface FilterStateStore {
+  filters: FiltersData;
+  filteredCars: Car[];
+  allCars: Car[];
+  isLoading: boolean;
+  getActiveFiltersCount: () => number;
+  // setFilter recibe la clave y el valor (string o number)
+  setFilter: (key: FilterKey, value: string | number) => void;
+  // removeFilter: clave y valor string (en caso de arrays). Si es numérico, se ignora el value.
+  removeFilter: (key: FilterKey, value?: string) => void;
+  clearFilters: () => void;
+  setFilteredCars: (cars: Car[]) => void;
+  setAllCars: (cars: Car[]) => void;
+  setIsLoading: (isLoading: boolean) => void;
+  applyFilters: () => void;
+}

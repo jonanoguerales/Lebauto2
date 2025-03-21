@@ -14,6 +14,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 
 export default function CatalogClient({
   allCars,
@@ -28,17 +29,25 @@ export default function CatalogClient({
   maxPrice,
   minPrice,
   maxYear,
-  minYear
+  minYear,
 }: CatalogClientProps) {
   const { view, setView } = useViewStore();
-  const { filteredCars, setFilteredCars, setFilter, setAllCars, clearFilters, isLoading } = useFilterStore();
-  const [isMounted, setIsMounted] = useState(false);
+  const {
+    filteredCars,
+    setFilteredCars,
+    filters,
+    setFilter,
+    setAllCars,
+    clearFilters,
+    getActiveFiltersCount,
+    isLoading,
+  } = useFilterStore();
   const [isOpen, setIsOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState("recent");
 
   useEffect(() => {
     clearFilters();
-  
+
     const brandrc = brand?.toString() || "all";
     const modelrc = model?.toString() || "all";
     const brandArray = brandrc.split(",").filter(Boolean);
@@ -76,15 +85,25 @@ export default function CatalogClient({
     if (minYear) {
       setFilter("minYear", minYear);
     }
-  
+
     setAllCars(allCars);
     setFilteredCars(initialCars);
-    setIsMounted(true);
   }, []);
-  
-  const updateView = useCallback((e?: MediaQueryListEvent) => {
-    setView(e ? (e.matches ? "list" : "grid") : window.innerWidth >= 1024 ? "list" : "grid");
-  }, [setView]);
+
+  const updateView = useCallback(
+    (e?: MediaQueryListEvent) => {
+      setView(
+        e
+          ? e.matches
+            ? "list"
+            : "grid"
+          : window.innerWidth >= 1024
+          ? "list"
+          : "grid"
+      );
+    },
+    [setView]
+  );
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 1024px)");
@@ -107,11 +126,11 @@ export default function CatalogClient({
     }
   }, [filteredCars, sortOrder]);
 
-  const toggleMenu = () => setIsOpen(prev => !prev);
+  const toggleMenu = () => setIsOpen((prev) => !prev);
 
-  if (!isMounted) {
-    return <div>Cargando...</div>;
-  }
+  const activeFiltersCount = useFilterStore((state) =>
+    state.getActiveFiltersCount()
+  );
 
   return (
     <div className="container mx-auto flex flex-col lg:flex-row min-h-screen py-12 gap-8 mt-16">
@@ -123,7 +142,7 @@ export default function CatalogClient({
 
       {isOpen && (
         <div className="fixed inset-0 z-50 bg-white overflow-y-auto custom-scrollbar lg:hidden">
-          <CarFilters isOpen={isOpen} toggleMenu={toggleMenu} sortedCars={sortedCars}/>
+          <CarFilters isOpen={isOpen} toggleMenu={toggleMenu} />
         </div>
       )}
 
@@ -167,23 +186,29 @@ export default function CatalogClient({
               onClick={toggleMenu}
               aria-label={isOpen ? "Cerrar filtros" : "Abrir filtros"}
               title={isOpen ? "Cerrar filtros" : "Abrir filtros"}
-              className="lg:hidden"
+              className="lg:hidden relative"
             >
-              {isOpen ? <FilterX className="h-4 w-4" /> : <Filter className="h-4 w-4" />}
+              {isOpen ? (
+                <FilterX className="h-4 w-4" />
+              ) : (
+                <Filter className="h-4 w-4" />
+              )}
+              <Badge variant="destructive" className="absolute top-[-10px] right-[-13px] px-2 py-[0.2rem]" aria-label="Filtros activos" title="Filtros activos">{activeFiltersCount}</Badge>
             </Button>
 
-            <Select
-              value={sortOrder}
-              onValueChange={setSortOrder}
-            >
+            <Select value={sortOrder} onValueChange={setSortOrder}>
               <SelectTrigger aria-label="Ordenar vehículos por">
                 <SelectValue placeholder="Ordenar resultados" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="recent">Más recientes</SelectItem>
                 <SelectItem value="price-asc">Precio: menor a mayor</SelectItem>
-                <SelectItem value="price-desc">Precio: mayor a menor</SelectItem>
-                <SelectItem value="km-asc">Kilómetros: menor a mayor</SelectItem>
+                <SelectItem value="price-desc">
+                  Precio: mayor a menor
+                </SelectItem>
+                <SelectItem value="km-asc">
+                  Kilómetros: menor a mayor
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>

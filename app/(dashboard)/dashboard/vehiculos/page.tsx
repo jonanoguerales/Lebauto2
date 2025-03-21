@@ -9,7 +9,7 @@ import { VehicleFormDialog } from "@/components/dashboard/vehicles/vehicleFormDi
 import { ImageManagerDialog } from "@/components/dashboard/vehicles/imageManagerDialog"
 import { FeaturesManagerDialog } from "@/components/dashboard/vehicles/featuresManagerDialog"
 import { fetchCars, createCar, updateCar, deleteCar } from "@/supabase/supabase"
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/useToast"
 import { Car } from "@/lib/definitions"
 
 export default function VehiclesPage() {

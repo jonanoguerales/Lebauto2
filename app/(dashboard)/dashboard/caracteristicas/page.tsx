@@ -5,7 +5,7 @@ import { DashboardHeader } from "@/components/dashboard/dashboardHeader";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { fetchFeatures, createFeature, updateFeature, deleteFeature } from "@/supabase/supabase";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/useToast";
 import { Feature } from "@/lib/definitions";
 import { FeaturesTable } from "@/components/dashboard/features/featureTable";
 import { FeatureFormDialog } from "@/components/dashboard/features/featureFormDialog";

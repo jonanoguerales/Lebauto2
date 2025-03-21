@@ -27,50 +27,28 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useFilterStore } from "@/lib/store";
 import { useRouter } from "next/navigation";
-
-type Filters = {
-  brand?: string[];
-  model?: string[];
-  color?: string[];
-  fuel?: string[];
-  location?: string[];
-  minPrice?: number;
-  maxPrice?: number;
-  minYear?: number;
-  maxYear?: number;
-  minKm?: number;
-  maxKm?: number;
-};
-
-export type Car = {
-  id: string;
-  brand: string;
-  model: string;
-  color: string;
-  fuel: string;
-  location?: string;
-  price: number;
-  year: number;
-  mileage: number;
-};
+import { useToast } from "@/hooks/useToast";
+import { useDebouncedCallback } from "use-debounce";
 
 export default function CarFilters({
-  sortedCars,
   isOpen = false,
   toggleMenu,
 }: {
-  sortedCars?: Car[];
   isOpen?: boolean;
   toggleMenu?: () => void;
 }) {
   const router = useRouter();
-  const { clearFilters } = useFilterStore();
-  const { filters, setFilter, removeFilter } = useFilterStore() as {
-    filters: Filters;
-    setFilter: (key: keyof Filters, value: any) => void;
-    removeFilter: (key: keyof Filters, value?: any) => void;
-  };
-  const { allCars } = useFilterStore() as { allCars: Car[] };
+  const { toast } = useToast();
+  const currentYear = new Date().getFullYear();
+
+  const {
+    filters,
+    setFilter,
+    filteredCars,
+    removeFilter,
+    clearFilters,
+    allCars,
+  } = useFilterStore();
 
   const [minPrice, setMinPrice] = useState<string>(
     filters.minPrice?.toString() || "0"
@@ -174,11 +152,11 @@ export default function CarFilters({
         params.set("minKm", filters.minKm.toString());
       if (filters.maxKm !== undefined)
         params.set("maxKm", filters.maxKm.toString());
-  
+
       const newUrl = params.toString()
         ? `/coches-segunda-mano?${params.toString()}`
         : "/coches-segunda-mano";
-  
+
       if (newUrl !== window.location.pathname + window.location.search) {
         router.replace(newUrl, { scroll: false });
       }
@@ -186,7 +164,6 @@ export default function CarFilters({
     const timeoutId = setTimeout(updateUrl, 500);
     return () => clearTimeout(timeoutId);
   }, [filters, router]);
-  
 
   useEffect(() => {
     const newState: Record<string, boolean> = {};
@@ -273,6 +250,49 @@ export default function CarFilters({
     router.push("/coches-segunda-mano");
   };
 
+  const handleRemoveFilter = (type: string, value: string) => {
+    if (type === "brand") {
+      removeFilter("brand", value);
+      setSelectAllModelsState((prev) => ({ ...prev, [value]: false }));
+      const modelsToRemove = modelsByBrand[value] || [];
+      modelsToRemove.forEach((model) => {
+        if (filters.model?.includes(model)) removeFilter("model", model);
+      });
+    } else if (type === "model") {
+      removeFilter("model", value);
+      const brand = uniqueBrands.find((b) => modelsByBrand[b]?.includes(value));
+      if (brand) {
+        const remaining =
+          filters.model?.filter((m) => modelsByBrand[brand].includes(m)) || [];
+        if (remaining.length === 0 && filters.brand?.includes(brand)) {
+          removeFilter("brand", brand);
+          setSelectAllModelsState((prev) => ({ ...prev, [brand]: false }));
+        }
+      }
+    } else if (type === "color") {
+      removeFilter("color", value);
+    } else if (type === "fuel") {
+      removeFilter("fuel", value);
+    } else if (type === "location") {
+      removeFilter("location", value);
+    } else if (type === "price") {
+      removeFilter("minPrice");
+      removeFilter("maxPrice");
+      setMinPrice("0");
+      setMaxPrice("100000");
+    } else if (type === "year") {
+      removeFilter("minYear");
+      removeFilter("maxYear");
+      setMinYear("1990");
+      setMaxYear(new Date().getFullYear().toString());
+    } else if (type === "km") {
+      removeFilter("minKm");
+      removeFilter("maxKm");
+      setMinKm("0");
+      setMaxKm("500000");
+    }
+  };
+
   const getActiveFilters = (): { type: string; value: string }[] => {
     const active: { type: string; value: string }[] = [];
     if (filters.model && filters.model.length > 0) {
@@ -333,43 +353,100 @@ export default function CarFilters({
     () => getActiveFilters(),
     [filters, modelsByBrand, uniqueBrands]
   );
-
-  const handleRemoveFilter = (type: string, value: string) => {
-    if (type === "brand") {
-      removeFilter("brand", value);
-      setSelectAllModelsState((prev) => ({ ...prev, [value]: false }));
-      const modelsToRemove = modelsByBrand[value] || [];
-      modelsToRemove.forEach((model) => {
-        if (filters.model?.includes(model)) removeFilter("model", model);
+  
+  const debouncedValidateMinPrice = useDebouncedCallback((value: string) => {
+    const numValue = Number(value);
+    if (Number(maxPrice) && numValue > Number(maxPrice)) {
+      toast({
+        title: "Error",
+        description:
+        "El precio mínimo no puede ser mayor que el precio máximo.",
+        variant: "destructive",
       });
-    } else if (type === "model") {
-      removeFilter("model", value);
-      const brand = uniqueBrands.find((b) => modelsByBrand[b]?.includes(value));
-      if (brand) {
-        const remaining =
-          filters.model?.filter((m) => modelsByBrand[brand].includes(m)) || [];
-        if (remaining.length === 0 && filters.brand?.includes(brand)) {
-          removeFilter("brand", brand);
-          setSelectAllModelsState((prev) => ({ ...prev, [brand]: false }));
-        }
-      }
-    } else if (type === "color") {
-      removeFilter("color", value);
-    } else if (type === "fuel") {
-      removeFilter("fuel", value);
-    } else if (type === "location") {
-      removeFilter("location", value);
-    } else if (type === "price") {
-      removeFilter("minPrice");
-      removeFilter("maxPrice");
-    } else if (type === "year") {
-      removeFilter("minYear");
-      removeFilter("maxYear");
-    } else if (type === "km") {
-      removeFilter("minKm");
-      removeFilter("maxKm");
+      setFilter("minPrice", Number(maxPrice));
+      setMinPrice(maxPrice);
+    } else {
+      setFilter("minPrice", numValue || 0);
     }
-  };
+  }, 500);
+  
+  const debouncedValidateMaxPrice = useDebouncedCallback((value: string) => {
+    const numValue = Number(value);
+    if (Number(minPrice) && numValue < Number(minPrice)) {
+      toast({
+        title: "Error",
+        description:
+          "El precio máximo no puede ser menor que el precio mínimo.",
+        variant: "destructive",
+      });
+      setFilter("maxPrice", Number(minPrice));
+      setMaxPrice(minPrice);
+    } else {
+      setFilter("maxPrice", numValue || 1000000);
+    }
+  }, 500);
+
+  const debouncedValidateMaxYear = useDebouncedCallback((value: string) => {
+    const numValue = Number(value);
+    if (Number(minYear) && numValue < Number(minYear)) {
+      toast({
+        title: "Error",
+        description: "El año máximo no puede ser menor que el año mínimo.",
+        variant: "destructive",
+      });
+      setFilter("maxYear", Number(minYear));
+      setMaxYear(minYear);
+    } else {
+      setFilter("maxYear", numValue || new Date().getFullYear());
+    }
+  }, 500);
+
+  const debouncedValidateMinYear = useDebouncedCallback((value: string) => {
+    const numValue = Number(value);
+    if (Number(maxYear) && numValue > Number(maxYear)) {
+      toast({
+        title: "Error",
+        description: "El año mínimo no puede ser mayor que el año máximo.",
+        variant: "destructive",
+      });
+      setFilter("minYear", Number(maxYear));
+      setMinYear(maxYear);
+    } else {
+      setFilter("minYear", numValue || 1990);
+    }
+  }, 500);
+
+  const debouncedValidateMaxKm = useDebouncedCallback((value: string) => {
+    const numValue = Number(value);
+    if (Number(minKm) && numValue < Number(minKm)) {
+      toast({
+        title: "Error",
+        description:
+          "Los kilómetros máximos no pueden ser menores que los kilómetros mínimos.",
+        variant: "destructive",
+      });
+      setFilter("maxKm", Number(minKm));
+      setMaxKm(minKm);
+    } else {
+      setFilter("maxKm", numValue || 500000);
+    }
+  }, 500);
+
+  const debouncedValidateMinKm = useDebouncedCallback((value: string) => {
+    const numValue = Number(value);
+    if (Number(maxKm) && numValue > Number(maxKm)) {
+      toast({
+        title: "Error",
+        description:
+          "Los kilómetros mínimos no pueden ser mayores que los kilómetros máximos.",
+        variant: "destructive",
+      });
+      setFilter("minKm", Number(maxKm));
+      setMinKm(maxKm);
+    } else {
+      setFilter("minKm", numValue || 0);
+    }
+  }, 500);
 
   return (
     <div className="space-y-6 p-6 flex flex-col justify-between h-full">
@@ -386,7 +463,7 @@ export default function CarFilters({
           )}
         </div>
         {activeFiltersArray.length > 0 && (
-          <div>
+          <div className="mt-4">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-medium">Tu búsqueda</h3>
               <Button
@@ -418,7 +495,7 @@ export default function CarFilters({
             </div>
           </div>
         )}
-        <Accordion type="multiple" defaultValue={["marca", "precio"]}>
+        <Accordion type="multiple" defaultValue={["marca"]}>
           <AccordionItem value="marca">
             <AccordionTrigger className="py-3">
               <div className="flex items-center gap-2">
@@ -528,6 +605,7 @@ export default function CarFilters({
               </div>
             </AccordionContent>
           </AccordionItem>
+          {/* Precio */}
           <AccordionItem value="precio">
             <AccordionTrigger className="py-3">
               <div className="flex items-center gap-2">
@@ -547,7 +625,7 @@ export default function CarFilters({
                       onFocus={(e) => e.target.select()}
                       onChange={(e) => {
                         setMinPrice(e.target.value);
-                        setFilter("minPrice", Number(e.target.value) || 0);
+                        debouncedValidateMinPrice(e.target.value);
                       }}
                       className="mt-1"
                     />
@@ -557,14 +635,11 @@ export default function CarFilters({
                     <Input
                       id="max-price"
                       type="number"
-                      value={maxPrice}
+                      value={maxPrice} // estado local
                       onFocus={(e) => e.target.select()}
                       onChange={(e) => {
                         setMaxPrice(e.target.value);
-                        setFilter(
-                          "maxPrice",
-                          Number(e.target.value) || 1000000
-                        );
+                        debouncedValidateMaxPrice(e.target.value);
                       }}
                       className="mt-1"
                     />
@@ -573,6 +648,8 @@ export default function CarFilters({
               </div>
             </AccordionContent>
           </AccordionItem>
+
+          {/* Año */}
           <AccordionItem value="año">
             <AccordionTrigger className="py-3">
               <div className="flex items-center gap-2">
@@ -588,11 +665,12 @@ export default function CarFilters({
                     <Input
                       id="min-year"
                       type="number"
+                      max={currentYear}
                       value={minYear}
                       onFocus={(e) => e.target.select()}
                       onChange={(e) => {
                         setMinYear(e.target.value);
-                        setFilter("minYear", Number(e.target.value) || 1990);
+                        debouncedValidateMinYear(e.target.value);
                       }}
                       className="mt-1"
                     />
@@ -606,10 +684,7 @@ export default function CarFilters({
                       onFocus={(e) => e.target.select()}
                       onChange={(e) => {
                         setMaxYear(e.target.value);
-                        setFilter(
-                          "maxYear",
-                          Number(e.target.value) || new Date().getFullYear()
-                        );
+                        debouncedValidateMaxYear(e.target.value);
                       }}
                       className="mt-1"
                     />
@@ -618,6 +693,8 @@ export default function CarFilters({
               </div>
             </AccordionContent>
           </AccordionItem>
+
+          {/* Kilómetros */}
           <AccordionItem value="km">
             <AccordionTrigger className="py-3">
               <div className="flex items-center gap-2">
@@ -637,7 +714,7 @@ export default function CarFilters({
                       onFocus={(e) => e.target.select()}
                       onChange={(e) => {
                         setMinKm(e.target.value);
-                        setFilter("minKm", Number(e.target.value) || 0);
+                        debouncedValidateMinKm(e.target.value);
                       }}
                       className="mt-1"
                     />
@@ -651,7 +728,7 @@ export default function CarFilters({
                       onFocus={(e) => e.target.select()}
                       onChange={(e) => {
                         setMaxKm(e.target.value);
-                        setFilter("maxKm", Number(e.target.value) || 500000);
+                        debouncedValidateMaxKm(e.target.value);
                       }}
                       className="mt-1"
                     />
@@ -660,6 +737,8 @@ export default function CarFilters({
               </div>
             </AccordionContent>
           </AccordionItem>
+
+          {/* Combustible */}
           <AccordionItem value="combustible">
             <AccordionTrigger className="py-3">
               <div className="flex items-center gap-2">
@@ -684,6 +763,8 @@ export default function CarFilters({
               </div>
             </AccordionContent>
           </AccordionItem>
+
+          {/* Color */}
           <AccordionItem value="color">
             <AccordionTrigger className="py-3">
               <div className="flex items-center gap-2">
@@ -708,6 +789,8 @@ export default function CarFilters({
               </div>
             </AccordionContent>
           </AccordionItem>
+
+          {/* Ubicación */}
           <AccordionItem value="ubicacion" className="mb-4">
             <AccordionTrigger className="py-3">
               <div className="flex items-center gap-2">
@@ -736,7 +819,7 @@ export default function CarFilters({
       </div>
       <div>
         <Button onClick={toggleMenu} className="lg:hidden w-full bg-gray-900">
-          Ver resultados ({sortedCars?.length || 0})
+          Ver resultados ({filteredCars.length})
         </Button>
       </div>
     </div>

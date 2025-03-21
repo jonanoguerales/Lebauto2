@@ -1,7 +1,7 @@
 "use client"
 
 import { create } from "zustand"
-import type { Car } from "./definitions"
+import type { Car, FiltersData, FilterStateStore } from "./definitions"
 
 type ViewType = "list" | "grid"
 
@@ -15,61 +15,18 @@ export const useViewStore = create<ViewState>((set) => ({
   setView: (view) => set({ view }),
 }))
 
-interface FiltersData {
-  condition?: string[];
-  brand?: string[];
-  model?: string[];
-  fuel?: string[];
-  location?: string[];
-  color?: string[];
-  minPrice?: number;
-  maxPrice?: number;
-  minYear?: number;
-  maxYear?: number;
-  minKm?: number;
-  maxKm?: number;
-}
-
-// Claves que son array de string
-type ArrayFilterKey = "condition" | "brand" | "model" | "fuel" | "location" | "color";
-
-// Claves que son numéricas
-type NumberFilterKey = "minPrice" | "maxPrice" | "minYear" | "maxYear" | "minKm" | "maxKm";
-
-// Union de todas las claves
-type FilterKey = ArrayFilterKey | NumberFilterKey;
-
-interface FilterState {
-  filters: FiltersData;
-  filteredCars: Car[];
-  allCars: Car[];
-  isLoading: boolean;
-
-  // setFilter recibe la clave y el valor (string o number)
-  setFilter: (key: FilterKey, value: string | number) => void;
-  // removeFilter: clave y valor string (en caso de arrays). Si es numérico, se ignora el value.
-  removeFilter: (key: FilterKey, value?: string) => void;
-  clearFilters: () => void;
-  setFilteredCars: (cars: Car[]) => void;
-  setAllCars: (cars: Car[]) => void;
-  setIsLoading: (isLoading: boolean) => void;
-  applyFilters: () => void;
-}
-
-
-export const useFilterStore = create<FilterState>((set, get) => ({
+export const useFilterStore = create<FilterStateStore>((set, get) => ({
   filters: {},
   filteredCars: [],
   allCars: [],
   isLoading: false,
 
-  setFilter: (key, value) => {
+  setFilter: (key : keyof FiltersData, value) => {
     set((state) => {
       const newFilters = { ...state.filters };
 
       // Si la clave es de tipo array
       if (
-        key === "condition" ||
         key === "brand" ||
         key === "model" ||
         key === "fuel" ||
@@ -102,7 +59,6 @@ export const useFilterStore = create<FilterState>((set, get) => ({
       const newFilters = { ...state.filters };
 
       if (
-        key === "condition" ||
         key === "brand" ||
         key === "model" ||
         key === "fuel" ||
@@ -189,13 +145,6 @@ export const useFilterStore = create<FilterState>((set, get) => ({
           const unionSet = new Set([...brandFiltered, ...modelFiltered]);
           filtered = [...unionSet];
         }
-
-        if (filters.condition && filters.condition.length > 0) {
-          const condSet = new Set(filters.condition);
-          filtered = filtered.filter(
-            (car) => car.condition && condSet.has(car.condition)
-          );
-        }
   
         if (filters.fuel && filters.fuel.length > 0) {
           const fuelSet = new Set(filters.fuel);
@@ -254,6 +203,21 @@ export const useFilterStore = create<FilterState>((set, get) => ({
         set({ filteredCars: [...allCars], isLoading: false });
       }
     }, 0);
+  },
+  
+  getActiveFiltersCount: () => {
+    const { filters } = get();
+    let count = 0;
+    for (const key in filters) {
+      const typedKey = key as keyof FiltersData;
+      const value = filters[typedKey];
+      if (Array.isArray(value)) {
+        count += value.length;
+      } else if (value !== undefined && value !== null) {
+        count += 1; 
+      }
+    }
+    return count;
   },
   
 }));
