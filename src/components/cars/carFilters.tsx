@@ -161,9 +161,9 @@ export default function CarFilters({
         router.replace(newUrl, { scroll: false });
       }
     };
-    const timeoutId = setTimeout(updateUrl, 500);
-    return () => clearTimeout(timeoutId);
-  }, [filters, router]);
+
+    updateUrl();
+  }, [filters]);
 
   useEffect(() => {
     const newState: Record<string, boolean> = {};

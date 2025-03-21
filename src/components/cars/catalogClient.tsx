@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useViewStore, useFilterStore } from "@/lib/store";
 import type { CatalogClientProps } from "@/lib/definitions";
 import { Button } from "@/components/ui/button";
-import { Filter, FilterX, Grid, List, X } from "lucide-react";
+import { Filter, FilterX, Grid, List } from "lucide-react";
 import CarList from "./carList";
 import CarFilters from "./carFilters";
 import {
@@ -15,6 +15,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { useResponsiveView } from "@/hooks/useResponsiveView";
 
 export default function CatalogClient({
   allCars,
@@ -35,7 +36,6 @@ export default function CatalogClient({
   const {
     filteredCars,
     setFilteredCars,
-    filters,
     setFilter,
     setAllCars,
     clearFilters,
@@ -90,27 +90,7 @@ export default function CatalogClient({
     setFilteredCars(initialCars);
   }, []);
 
-  const updateView = useCallback(
-    (e?: MediaQueryListEvent) => {
-      setView(
-        e
-          ? e.matches
-            ? "list"
-            : "grid"
-          : window.innerWidth >= 1024
-          ? "list"
-          : "grid"
-      );
-    },
-    [setView]
-  );
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(min-width: 1024px)");
-    updateView();
-    mediaQuery.addEventListener("change", updateView);
-    return () => mediaQuery.removeEventListener("change", updateView);
-  }, [updateView]);
+  useResponsiveView();
 
   const sortedCars = useMemo(() => {
     const cars = [...filteredCars];
@@ -126,7 +106,7 @@ export default function CatalogClient({
     }
   }, [filteredCars, sortOrder]);
 
-  const toggleMenu = () => setIsOpen((prev) => !prev);
+  const toggleMenu = useCallback(() => setIsOpen((prev) => !prev), []);
 
   const activeFiltersCount = useFilterStore((state) =>
     state.getActiveFiltersCount()
@@ -193,7 +173,14 @@ export default function CatalogClient({
               ) : (
                 <Filter className="h-4 w-4" />
               )}
-              <Badge variant="destructive" className="absolute top-[-10px] right-[-13px] px-2 py-[0.2rem]" aria-label="Filtros activos" title="Filtros activos">{activeFiltersCount}</Badge>
+              <Badge
+                variant="destructive"
+                className="absolute top-[-10px] right-[-13px] px-2 py-[0.2rem]"
+                aria-label="Filtros activos"
+                title="Filtros activos"
+              >
+                {activeFiltersCount}
+              </Badge>
             </Button>
 
             <Select value={sortOrder} onValueChange={setSortOrder}>
@@ -203,12 +190,8 @@ export default function CatalogClient({
               <SelectContent>
                 <SelectItem value="recent">Más recientes</SelectItem>
                 <SelectItem value="price-asc">Precio: menor a mayor</SelectItem>
-                <SelectItem value="price-desc">
-                  Precio: mayor a menor
-                </SelectItem>
-                <SelectItem value="km-asc">
-                  Kilómetros: menor a mayor
-                </SelectItem>
+                <SelectItem value="price-desc">Precio: mayor a menor</SelectItem>
+                <SelectItem value="km-asc">Kilómetros: menor a mayor</SelectItem>
               </SelectContent>
             </Select>
           </div>

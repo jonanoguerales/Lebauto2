@@ -25,7 +25,6 @@ export const useFilterStore = create<FilterStateStore>((set, get) => ({
     set((state) => {
       const newFilters = { ...state.filters };
 
-      // Si la clave es de tipo array
       if (
         key === "brand" ||
         key === "model" ||
@@ -33,24 +32,20 @@ export const useFilterStore = create<FilterStateStore>((set, get) => ({
         key === "location" ||
         key === "color"
       ) {
-        // Aseguramos que sea un array
         if (!newFilters[key]) {
           newFilters[key] = [];
         }
         const arr = newFilters[key] as string[];
-        // Agregamos el valor si no existe
         if (!arr.includes(value as string)) {
           arr.push(value as string);
         }
       } else {
-        // Clave numérica (minPrice, maxPrice, etc.)
         newFilters[key] = value as number;
       }
 
       return { filters: newFilters, isLoading: true };
     });
 
-    // Aplicas tu lógica de filtrado
     setTimeout(() => get().applyFilters(), 0);
   },
 
@@ -65,20 +60,16 @@ export const useFilterStore = create<FilterStateStore>((set, get) => ({
         key === "location" ||
         key === "color"
       ) {
-        // Es un array de string
         if (value !== undefined) {
-          // Eliminamos ese string del array
           const arr = newFilters[key] as string[];
           newFilters[key] = arr.filter((v) => v !== value);
           if ((newFilters[key] as string[]).length === 0) {
             delete newFilters[key];
           }
         } else {
-          // Si no se especificó value, borramos toda la propiedad
           delete newFilters[key];
         }
       } else {
-        // Clave numérica => simplemente borramos la propiedad
         delete newFilters[key];
       }
 
