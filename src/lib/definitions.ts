@@ -28,6 +28,7 @@ export interface Car {
   financePrice?: number;
   features?: string[]; 
   description?: string; 
+  slug?: string;
 }
 
 
@@ -71,8 +72,6 @@ export interface CarImage {
 export interface Feature {
   id: string
   name: string
-  category?: string
-  created_at?: string
 }
 
 export interface CarFeature {

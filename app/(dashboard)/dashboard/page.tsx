@@ -1,8 +1,8 @@
 import { DashboardHeader } from "@/components/dashboard/dashboardHeader";
-import { StatsCards } from "@/components/dashboard/statsCards";
-import { SalesChart } from "@/components/dashboard/salesChart";
-import { VehicleDistributionChart } from "@/components/dashboard/vehicleDistributionChart";
-import { RecentVehicles } from "@/components/dashboard/recentVehicles";
+import { StatsCards } from "@/components/dashboard/home/statsCards";
+import { SalesChart } from "@/components/dashboard/home/salesChart";
+import { VehicleDistributionChart } from "@/components/dashboard/home/vehicleDistributionChart";
+import { RecentVehicles } from "@/components/dashboard/home/recentVehicles";
 
 export default function Home() {
   return (

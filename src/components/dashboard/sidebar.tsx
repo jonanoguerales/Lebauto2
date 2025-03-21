@@ -3,9 +3,10 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/utils/utils"
-import { LayoutDashboard, Car, LogOut, Menu, X } from "lucide-react"
+import { LayoutDashboard, Car, Menu, X, ListTodo } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
+import AuthButton from "./AuthButton"
 
 const navItems = [
   {
@@ -18,6 +19,11 @@ const navItems = [
     href: "/dashboard/vehiculos",
     icon: Car,
   },
+  {
+    title: "Características",
+    href: "/dashboard/caracteristicas",
+    icon: ListTodo,
+  },
 ]
 
 export function Sidebar() {
@@ -27,7 +33,7 @@ export function Sidebar() {
   return (
     <>
       <div className="fixed top-0 left-0 z-40 w-full bg-background md:hidden flex items-center justify-between p-4 border-b">
-        <div className="font-bold text-xl">AutoGest</div>
+        <div className="font-bold text-xl">Lebauto</div>
         <Button variant="ghost" size="icon" onClick={() => setIsOpen(!isOpen)}>
           {isOpen ? <X /> : <Menu />}
         </Button>
@@ -41,7 +47,7 @@ export function Sidebar() {
       >
         <div className="flex flex-col h-full pt-16 md:pt-0">
           <div className="p-6 border-b hidden md:block">
-            <h2 className="font-bold text-2xl">AutoGest</h2>
+            <h2 className="font-bold text-2xl">Lebauto</h2>
           </div>
 
           <div className="flex-1 py-6 px-4 space-y-1 overflow-y-auto">
@@ -60,24 +66,7 @@ export function Sidebar() {
               </Link>
             ))}
           </div>
-
-          <div className="p-4 border-t flex flex-col gap-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
-                  A
-                </div>
-                <div>
-                  <p className="text-sm font-medium">Admin</p>
-                  <p className="text-xs text-muted-foreground">admin@autogest.com</p>
-                </div>
-              </div>
-            </div>
-            <Button variant="outline" className="w-full justify-start mt-2">
-              <LogOut className="mr-2 h-4 w-4" />
-              Cerrar sesión
-            </Button>
-          </div>
+            <AuthButton />
         </div>
       </div>
     </>

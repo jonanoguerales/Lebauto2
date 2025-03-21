@@ -13,7 +13,7 @@ export default function CarCardGrid({ car }: CarCardGridProps) {
 
   return (
     <Link
-      href={`/vehiculo/${car.id}`}
+      href={`/coches-segunda-mano/${car.slug}`}
       className="block bg-card rounded-lg border shadow-sm hover:shadow-md transition-shadow animate-fade-in"
       aria-label={`Ver detalles del ${car.brand} ${car.model}`}
     >

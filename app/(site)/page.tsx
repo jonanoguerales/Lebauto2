@@ -1,21 +1,43 @@
 import BrandGrid from "@/components/home/brandGrid";
 import ContactButtons from "@/components/contactButtons";
-import Faq from "@/components/faq";
 import CategoriesSection from "@/components/home/categories-section";
 import HeroSection from "@/components/home/hero-section";
 import SearchSection from "@/components/home/search-section";
-import Link from "next/link";
 import SellYourCarSection from "@/components/home/sellYourCarSection";
+import Link from "next/link";
 import type { Metadata } from "next";
+import ElectricVehiclesSection from "@/components/home/electricVehiclesSection";
+import ElectricChargersSection from "@/components/home/electricShargersSection";
+import WhyElectricSection from "@/components/home/whyElectricSection";
+import SavingsCalculator from "@/components/home/savingsCalculator";
+import SubsidiesSection from "@/components/home/subsidiesSection";
 
 export const metadata: Metadata = {
-  title: "Lebauto | Concesionario de Coches Segunda Mano y Ocasión",
-  description: "Compra tu coche de segunda mano, ocasión o Km 0 en Lebauto. Vehículos revisados, con garantía y financiación.",
-  keywords: ["coches segunda mano", "coches km0", "concesionario coches", "Lebauto"],
+  title:
+    "Lebauto | Concesionario de Coches Eléctricos y de Segunda Mano | Vehículos Sostenibles",
+  description:
+    "Compra tu coche de segunda mano, ocasión, eléctricos o Km 0 en Lebauto. Vehículos revisados, con garantía y financiación. Ofrecemos soluciones de carga, financiación especializada y asesoramiento en ayudas y subvenciones para la movilidad sostenible.",
+  keywords: [
+    "coches segunda mano",
+    "coches km0",
+    "concesionario coches",
+    "Lebauto",
+    "coches eléctricos",
+    "vehículos segunda mano",
+    "cargadores eléctricos",
+    "concesionario sostenible",
+    "km0",
+    "financiación vehículos eléctricos",
+    "ayudas movilidad eléctrica",
+  ],
   openGraph: {
-    title: "Lebauto | Concesionario de Coches Segunda Mano y Ocasión",
-    description: "Compra tu coche de segunda mano, ocasión o Km 0 en Lebauto. Vehículos revisados, con garantía y financiación.",
-    images: "/imgHome.avif",
+    title:
+      "Lebauto | Concesionario de Coches Eléctricos y de Segunda Mano | Vehículos Sostenibles",
+    description:
+      "Compra tu coche de segunda mano, ocasión, eléctricos o Km 0 en Lebauto. Vehículos revisados, con garantía y financiación. Ofrecemos soluciones de carga, financiación especializada y asesoramiento en ayudas y subvenciones para la movilidad sostenible.",
+    type: "website",
+    locale: "es_ES",
+    url: "https://lebauto.vercel.app",
   },
 };
 
@@ -25,9 +47,9 @@ export default function HomePage() {
       <HeroSection />
       <SearchSection />
       <CategoriesSection />
+      <ElectricVehiclesSection />
       <SellYourCarSection />
-      
-      <section className="py-16 bg-muted/40">
+      <section className="py-20 bg-muted/40">
         <div className="container mx-auto flex flex-col items-center gap-8">
           <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">
             Encuentra tu marca favorita
@@ -41,15 +63,64 @@ export default function HomePage() {
           </Link>
         </div>
       </section>
-      
-      <section className="py-16 bg-muted/40">
-        <div className="container mx-auto sm:px-28">
-          <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">Preguntas frecuentes</h2>
-          <Faq />
-        </div>
-      </section>
-      
+      <ElectricChargersSection />
+      <WhyElectricSection />
+      <SavingsCalculator />
+      <SubsidiesSection />
       <ContactButtons />
+
+      {/* Datos estructurados para SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            name: "Lebauto",
+            description:
+              "Concesionario de Coches Eléctricos y de Segunda Mano. Especialistas en vehículos eléctricos de segunda mano, km0 y nuevos. Ofrecemos soluciones de carga, financiación especializada y asesoramiento en ayudas y subvenciones para la movilidad sostenible.",
+            url: "https://lebauto.vercel.app",
+            telephone: "+34912345678",
+            address: {
+              "@type": "PostalAddress",
+              streetAddress: "Avenida de los Coches, 123",
+              addressLocality: "Madrid",
+              postalCode: "28001",
+              addressCountry: "ES",
+            },
+            geo: {
+              "@type": "GeoCoordinates",
+              latitude: "40.4168",
+              longitude: "-3.7038",
+            },
+            openingHoursSpecification: [
+              {
+                "@type": "OpeningHoursSpecification",
+                dayOfWeek: [
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday",
+                ],
+                opens: "09:00",
+                closes: "20:00",
+              },
+              {
+                "@type": "OpeningHoursSpecification",
+                dayOfWeek: "Saturday",
+                opens: "10:00",
+                closes: "14:00",
+              },
+            ],
+            sameAs: [
+              "https://www.facebook.com/lebauto",
+              "https://www.instagram.com/lebauto",
+              "https://twitter.com/lebauto",
+            ],
+          }),
+        }}
+      />
     </>
   );
 }

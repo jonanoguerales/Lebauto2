@@ -13,7 +13,7 @@ const benefits = [
 
 export default function SellYourCarSection() {
   return (
-    <section className="py-16 bg-white" role="region" aria-labelledby="sell-your-car-title">
+    <section className="py-20 bg-white" role="region" aria-labelledby="sell-your-car-title">
       <div className="container mx-auto grid md:grid-cols-2 gap-28 md:gap-12 items-center">
         <div className="order-2 md:order-1">
           <h2 id="sell-your-car-title" className="text-3xl md:text-4xl font-bold mb-6">

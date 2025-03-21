@@ -11,14 +11,14 @@ import Link from "next/link";
 export default function CategoriesSection() {
   return (
     <section
-      className="bg-white py-32"
+      className="bg-white py-20"
       role="region"
       aria-labelledby="categories-title"
     >
       <div className="container mx-auto">
         <h2
           id="categories-title"
-          className="text-3xl md:text-4xl font-bold text-gray-900 mb-12 text-center"
+          className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center"
         >
           Nuestras Categorías
         </h2>

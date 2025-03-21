@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from "react"
 import { DashboardHeader } from "@/components/dashboard/dashboardHeader"
-import { VehiclesTable } from "@/components/dashboard/vehiclesTable"
+import { VehiclesTable } from "@/components/dashboard/vehicles/vehiclesTable"
 import { Button } from "@/components/ui/button"
 import { PlusCircle } from "lucide-react"
-import { VehicleFormDialog } from "@/components/dashboard/vehicleFormDialog"
-import { ImageManagerDialog } from "@/components/dashboard/imageManagerDialog"
-import { FeaturesManagerDialog } from "@/components/dashboard/featuresManagerDialog"
-import { fetchCars, createCar, updateCar, deleteCar } from "@/utils/supabase/supabase"
-import { toast } from "@/hooks/use-toast"
+import { VehicleFormDialog } from "@/components/dashboard/vehicles/vehicleFormDialog"
+import { ImageManagerDialog } from "@/components/dashboard/vehicles/imageManagerDialog"
+import { FeaturesManagerDialog } from "@/components/dashboard/vehicles/featuresManagerDialog"
+import { fetchCars, createCar, updateCar, deleteCar } from "@/supabase/supabase"
+import { useToast } from "@/hooks/use-toast"
 import { Car } from "@/lib/definitions"
 
 export default function VehiclesPage() {
@@ -20,18 +20,28 @@ export default function VehiclesPage() {
   const [isFeaturesDialogOpen, setIsFeaturesDialogOpen] = useState(false)
   const [editingVehicle, setEditingVehicle] = useState<Car | null>(null)
   const [selectedVehicle, setSelectedVehicle] = useState<Car | null>(null)
+  const { toast } = useToast()
 
-  // Cargar vehículos al montar el componente
   useEffect(() => {
     const loadVehicles = async () => {
       setIsLoading(true)
-      const cars = await fetchCars()
-      setVehicles(cars)
-      setIsLoading(false)
+      try {
+        const cars = await fetchCars()
+        setVehicles(cars)
+      } catch (error) {
+        console.error("Error loading vehicles:", error)
+        toast({
+          title: "Error",
+          description: "No se pudieron cargar los vehículos. Inténtalo de nuevo.",
+          variant: "destructive",
+        })
+      } finally {
+        setIsLoading(false)
+      }
     }
 
     loadVehicles()
-  }, [])
+  }, [toast])
 
   const handleAddNew = () => {
     setEditingVehicle(null)
@@ -56,7 +66,6 @@ export default function VehiclesPage() {
   const handleSaveVehicle = async (vehicle: Car) => {
     try {
       if (editingVehicle) {
-        // Actualizar vehículo existente
         const updatedVehicle = await updateCar(vehicle.id, vehicle)
         if (updatedVehicle) {
           setVehicles((prev) => prev.map((v) => (v.id === vehicle.id ? updatedVehicle : v)))
@@ -72,7 +81,6 @@ export default function VehiclesPage() {
           })
         }
       } else {
-        // Crear nuevo vehículo
         const newVehicle = await createCar(vehicle)
         if (newVehicle) {
           setVehicles((prev) => [...prev, newVehicle])
@@ -103,9 +111,24 @@ export default function VehiclesPage() {
     if (!selectedVehicle) return
 
     try {
-      const updatedVehicle = await updateCar(selectedVehicle.id, { images })
+      const vehicleToUpdate = { ...selectedVehicle, images: [...images] }
+
+      const updatedVehicle = await updateCar(selectedVehicle.id, {
+        images: [...images],
+      })
+
       if (updatedVehicle) {
-        setVehicles((prev) => prev.map((v) => (v.id === selectedVehicle.id ? updatedVehicle : v)))
+        setVehicles((prev) =>
+          prev.map((v) =>
+            v.id === selectedVehicle.id
+              ? {
+                  ...v,
+                  images: updatedVehicle.images || [],
+                }
+              : v,
+          ),
+        )
+
         toast({
           title: "Imágenes actualizadas",
           description: "Las imágenes del vehículo han sido actualizadas correctamente.",
@@ -131,9 +154,15 @@ export default function VehiclesPage() {
     if (!selectedVehicle) return
 
     try {
+      const vehicleToUpdate = { ...selectedVehicle, features: [...features] }
+
       const updatedVehicle = await updateCar(selectedVehicle.id, { features })
+
       if (updatedVehicle) {
-        setVehicles((prev) => prev.map((v) => (v.id === selectedVehicle.id ? updatedVehicle : v)))
+        setVehicles((prev) =>
+          prev.map((v) => (v.id === selectedVehicle.id ? { ...v, features: updatedVehicle.features || [] } : v)),
+        )
+
         toast({
           title: "Características actualizadas",
           description: "Las características del vehículo han sido actualizadas correctamente.",
@@ -189,7 +218,7 @@ export default function VehiclesPage() {
         action={
           <Button onClick={handleAddNew}>
             <PlusCircle className="mr-2 h-4 w-4" />
-            Añadir Vehículo
+            Añadir vehículo
           </Button>
         }
       />

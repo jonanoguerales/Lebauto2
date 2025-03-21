@@ -1,13 +1,33 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Edit, Trash2, Search, ChevronDown, ChevronUp, Image, ListChecks } from "lucide-react"
-import { formatCurrency } from "@/utils/utils"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Edit,
+  Trash2,
+  Search,
+  ChevronDown,
+  ChevronUp,
+  Image,
+  ListChecks,
+} from "lucide-react";
+import { formatCurrency } from "@/utils/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,70 +37,78 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { Car } from "@/lib/definitions"
+} from "@/components/ui/alert-dialog";
+import { Car } from "@/lib/definitions";
 
 interface VehiclesTableProps {
-  vehicles: Car[]
-  onEdit: (vehicle: Car) => void
-  onDelete: (id: string) => void
-  onManageImages: (vehicle: Car) => void
-  onManageFeatures: (vehicle: Car) => void
+  vehicles: Car[];
+  onEdit: (vehicle: Car) => void;
+  onDelete: (id: string) => void;
+  onManageImages: (vehicle: Car) => void;
+  onManageFeatures: (vehicle: Car) => void;
 }
 
-export function VehiclesTable({ vehicles, onEdit, onDelete, onManageImages, onManageFeatures }: VehiclesTableProps) {
-  // Asegurarse de que el input de búsqueda siempre tenga un valor definido
-  const [searchTerm, setSearchTerm] = useState("")
-
-  const [sortField, setSortField] = useState<keyof Car | null>(null)
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
-  const [deleteId, setDeleteId] = useState<string | null>(null)
+export function VehiclesTable({
+  vehicles,
+  onEdit,
+  onDelete,
+  onManageImages,
+  onManageFeatures,
+}: VehiclesTableProps) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortField, setSortField] = useState<keyof Car | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const handleSort = (field: keyof Car) => {
     if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc")
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
-      setSortField(field)
-      setSortDirection("asc")
+      setSortField(field);
+      setSortDirection("asc");
     }
-  }
+  };
 
-  const filteredVehicles = vehicles.filter(
-    (vehicle) =>
-      vehicle.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      vehicle.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      vehicle.year.toString().includes(searchTerm) ||
-      vehicle.condition.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (vehicle.location && vehicle.location.toLowerCase().includes(searchTerm.toLowerCase())),
-  )
+  const filteredVehicles = vehicles.filter((vehicle) => {
+    const term = searchTerm.toLowerCase();
+    return (
+      (vehicle.brand && vehicle.brand.toLowerCase().includes(term)) ||
+      (vehicle.model && vehicle.model.toLowerCase().includes(term)) ||
+      (vehicle.year && vehicle.year.toString().includes(term)) ||
+      (vehicle.condition && vehicle.condition.toLowerCase().includes(term)) ||
+      (vehicle.location && vehicle.location.toLowerCase().includes(term))
+    );
+  });
 
   const sortedVehicles = [...filteredVehicles].sort((a, b) => {
-    if (!sortField) return 0
+    if (!sortField) return 0;
 
-    const aValue = a[sortField]
-    const bValue = b[sortField]
+    const aValue = a[sortField];
+    const bValue = b[sortField];
 
     if (typeof aValue === "string" && typeof bValue === "string") {
-      return sortDirection === "asc" ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
+      return sortDirection === "asc"
+        ? aValue.localeCompare(bValue)
+        : bValue.localeCompare(aValue);
     }
 
     if (typeof aValue === "number" && typeof bValue === "number") {
-      return sortDirection === "asc" ? aValue - bValue : bValue - aValue
+      return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
     }
 
-    return 0
-  })
+    return 0;
+  });
 
   const handleDeleteClick = (id: string) => {
-    setDeleteId(id)
-  }
+    setDeleteId(id);
+  };
 
   const confirmDelete = () => {
     if (deleteId) {
-      onDelete(deleteId)
-      setDeleteId(null)
+      onDelete(deleteId);
+      setDeleteId(null);
     }
-  }
+  };
 
   return (
     <>
@@ -90,8 +118,8 @@ export function VehiclesTable({ vehicles, onEdit, onDelete, onManageImages, onMa
           <Input
             type="search"
             placeholder="Buscar vehículos..."
-            className="pl-8"
-            value={searchTerm || ""} // Asegurar que nunca sea undefined
+            className="pl-8 h-[2.2rem]"
+            value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
@@ -101,7 +129,10 @@ export function VehiclesTable({ vehicles, onEdit, onDelete, onManageImages, onMa
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="cursor-pointer" onClick={() => handleSort("brand")}>
+              <TableHead
+                className="cursor-pointer"
+                onClick={() => handleSort("brand")}
+              >
                 <div className="flex items-center">
                   Marca
                   {sortField === "brand" &&
@@ -112,7 +143,10 @@ export function VehiclesTable({ vehicles, onEdit, onDelete, onManageImages, onMa
                     ))}
                 </div>
               </TableHead>
-              <TableHead className="cursor-pointer" onClick={() => handleSort("model")}>
+              <TableHead
+                className="cursor-pointer"
+                onClick={() => handleSort("model")}
+              >
                 <div className="flex items-center">
                   Modelo
                   {sortField === "model" &&
@@ -123,7 +157,10 @@ export function VehiclesTable({ vehicles, onEdit, onDelete, onManageImages, onMa
                     ))}
                 </div>
               </TableHead>
-              <TableHead className="cursor-pointer" onClick={() => handleSort("year")}>
+              <TableHead
+                className="cursor-pointer"
+                onClick={() => handleSort("year")}
+              >
                 <div className="flex items-center">
                   Año
                   {sortField === "year" &&
@@ -134,7 +171,10 @@ export function VehiclesTable({ vehicles, onEdit, onDelete, onManageImages, onMa
                     ))}
                 </div>
               </TableHead>
-              <TableHead className="cursor-pointer text-right" onClick={() => handleSort("price")}>
+              <TableHead
+                className="cursor-pointer text-right"
+                onClick={() => handleSort("price")}
+              >
                 <div className="flex items-center justify-end">
                   Precio
                   {sortField === "price" &&
@@ -145,7 +185,10 @@ export function VehiclesTable({ vehicles, onEdit, onDelete, onManageImages, onMa
                     ))}
                 </div>
               </TableHead>
-              <TableHead className="cursor-pointer" onClick={() => handleSort("condition")}>
+              <TableHead
+                className="cursor-pointer"
+                onClick={() => handleSort("condition")}
+              >
                 <div className="flex items-center">
                   Estado
                   {sortField === "condition" &&
@@ -169,23 +212,27 @@ export function VehiclesTable({ vehicles, onEdit, onDelete, onManageImages, onMa
             ) : (
               sortedVehicles.map((vehicle) => (
                 <TableRow key={vehicle.id}>
-                  <TableCell className="font-medium">{vehicle.brand}</TableCell>
-                  <TableCell>
-                    {vehicle.model} {vehicle.variant}
+                  <TableCell className="font-medium">
+                    {vehicle.brand || ""}
                   </TableCell>
-                  <TableCell>{vehicle.year}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(vehicle.price)}</TableCell>
+                  <TableCell>
+                    {vehicle.model || ""} {vehicle.variant || ""}
+                  </TableCell>
+                  <TableCell>{vehicle.year || ""}</TableCell>
+                  <TableCell className="text-right">
+                    {formatCurrency(vehicle.price || 0)}
+                  </TableCell>
                   <TableCell>
                     <Badge
                       variant={
                         vehicle.condition === "Nuevo"
                           ? "default"
                           : vehicle.condition === "Vendido"
-                            ? "destructive"
-                            : "secondary"
+                          ? "destructive"
+                          : "secondary"
                       }
                     >
-                      {vehicle.condition}
+                      {vehicle.condition || "Desconocido"}
                     </Badge>
                   </TableCell>
                   <TableCell>
@@ -200,11 +247,15 @@ export function VehiclesTable({ vehicles, onEdit, onDelete, onManageImages, onMa
                           <Edit className="mr-2 h-4 w-4" />
                           Editar
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onManageImages(vehicle)}>
+                        <DropdownMenuItem
+                          onClick={() => onManageImages(vehicle)}
+                        >
                           <Image className="mr-2 h-4 w-4" />
                           Gestionar imágenes
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onManageFeatures(vehicle)}>
+                        <DropdownMenuItem
+                          onClick={() => onManageFeatures(vehicle)}
+                        >
                           <ListChecks className="mr-2 h-4 w-4" />
                           Gestionar características
                         </DropdownMenuItem>
@@ -230,18 +281,21 @@ export function VehiclesTable({ vehicles, onEdit, onDelete, onManageImages, onMa
           <AlertDialogHeader>
             <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. El vehículo será eliminado permanentemente de la base de datos.
+              Esta acción no se puede deshacer. El vehículo será eliminado
+              permanentemente de la base de datos.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground">
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-destructive text-destructive-foreground"
+            >
               Eliminar
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </>
-  )
+  );
 }
-

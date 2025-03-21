@@ -1,7 +1,20 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Bar,
+  BarChart,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+  Tooltip,
+} from "recharts";
 
 const data = [
   { month: "Ene", ventas: 12 },
@@ -16,14 +29,16 @@ const data = [
   { month: "Oct", ventas: 24 },
   { month: "Nov", ventas: 20 },
   { month: "Dic", ventas: 28 },
-]
+];
 
 export function SalesChart() {
   return (
     <Card>
       <CardHeader>
         <CardTitle>Ventas Mensuales</CardTitle>
-        <CardDescription>Número de vehículos vendidos por mes durante el último año</CardDescription>
+        <CardDescription>
+          Número de vehículos vendidos por mes durante el último año
+        </CardDescription>
       </CardHeader>
       <CardContent className="h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
@@ -34,11 +49,14 @@ export function SalesChart() {
               formatter={(value) => [`${value} vehículos`, "Ventas"]}
               labelFormatter={(label) => `Mes: ${label}`}
             />
-            <Bar dataKey="ventas" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+            <Bar
+              dataKey="ventas"
+              fill="hsl(var(--primary))"
+              radius={[4, 4, 0, 0]}
+            />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>
     </Card>
-  )
+  );
 }
-

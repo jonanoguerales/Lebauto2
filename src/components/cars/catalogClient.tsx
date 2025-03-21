@@ -80,7 +80,6 @@ export default function CatalogClient({
     setAllCars(allCars);
     setFilteredCars(initialCars);
     setIsMounted(true);
-    
   }, []);
   
   const updateView = useCallback((e?: MediaQueryListEvent) => {
@@ -110,7 +109,9 @@ export default function CatalogClient({
 
   const toggleMenu = () => setIsOpen(prev => !prev);
 
-  if (!isMounted) return null;
+  if (!isMounted) {
+    return <div>Cargando...</div>;
+  }
 
   return (
     <div className="container mx-auto flex flex-col lg:flex-row min-h-screen py-12 gap-8 mt-16">

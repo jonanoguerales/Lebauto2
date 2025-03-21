@@ -247,7 +247,6 @@ export const useFilterStore = create<FilterState>((set, get) => ({
           );
         }
   
-        console.log("Final filtered cars:", filtered.length);
         set({ filteredCars: filtered, isLoading: false });
   
       } catch (error) {

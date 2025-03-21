@@ -174,14 +174,19 @@ export default function CarFilters({
         params.set("minKm", filters.minKm.toString());
       if (filters.maxKm !== undefined)
         params.set("maxKm", filters.maxKm.toString());
+  
       const newUrl = params.toString()
         ? `/coches-segunda-mano?${params.toString()}`
         : "/coches-segunda-mano";
-      router.push(newUrl, { scroll: false });
+  
+      if (newUrl !== window.location.pathname + window.location.search) {
+        router.replace(newUrl, { scroll: false });
+      }
     };
     const timeoutId = setTimeout(updateUrl, 500);
     return () => clearTimeout(timeoutId);
   }, [filters, router]);
+  
 
   useEffect(() => {
     const newState: Record<string, boolean> = {};
@@ -427,14 +432,14 @@ export default function CarFilters({
                   <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                   <Input
                     placeholder="Buscar marca o modelo..."
-                    className="pl-10 pr-10"
+                    className="pl-10 pr-4"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                   {searchTerm && (
                     <button
                       onClick={() => setSearchTerm("")}
-                      className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700"
+                      className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
                       aria-label="Borrar búsqueda"
                     >
                       <X className="h-4 w-4" />

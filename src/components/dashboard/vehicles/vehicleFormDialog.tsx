@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import { z } from "zod"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import { useEffect } from "react";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Dialog,
   DialogContent,
@@ -11,15 +11,29 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Textarea } from "@/components/ui/textarea"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import type { Car } from "@/utils/supabase/supabase"
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormDescription,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Car } from "@/lib/definitions";
 
 const vehicleSchema = z.object({
   id: z.string().optional(),
@@ -34,7 +48,9 @@ const vehicleSchema = z.object({
     .int()
     .min(1900, "El año debe ser mayor a 1900")
     .max(new Date().getFullYear() + 1),
-  mileage: z.coerce.number().nonnegative("El kilometraje no puede ser negativo"),
+  mileage: z.coerce
+    .number()
+    .nonnegative("El kilometraje no puede ser negativo"),
   body_type: z.string().optional(),
   fuel: z.string().min(1, "El tipo de combustible es obligatorio"),
   transmission: z.string().optional(),
@@ -43,7 +59,10 @@ const vehicleSchema = z.object({
   power: z.coerce.number().optional(),
   engine_displacement: z.coerce.number().optional(),
   color: z.string().min(1, "El color es obligatorio"),
-  doors: z.coerce.number().int().min(1, "El número de puertas debe ser al menos 1"),
+  doors: z.coerce
+    .number()
+    .int()
+    .min(1, "El número de puertas debe ser al menos 1"),
   electric_range: z.coerce.number().optional(),
   battery_capacity: z.coerce.number().optional(),
   charging_time: z.coerce.number().optional(),
@@ -53,21 +72,25 @@ const vehicleSchema = z.object({
   monthly_price: z.coerce.number().optional(),
   finance_price: z.coerce.number().optional(),
   description: z.string().optional(),
-  // Estos campos se manejan por separado
   images: z.array(z.string()).default([]),
   features: z.array(z.string()).default([]),
-})
+});
 
-type VehicleFormValues = z.infer<typeof vehicleSchema>
+type VehicleFormValues = z.infer<typeof vehicleSchema>;
 
 interface VehicleFormDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  vehicle: Car | null
-  onSave: (vehicle: Car) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  vehicle: Car | null;
+  onSave: (vehicle: Car) => void;
 }
 
-export function VehicleFormDialog({ open, onOpenChange, vehicle, onSave }: VehicleFormDialogProps) {
+export function VehicleFormDialog({
+  open,
+  onOpenChange,
+  vehicle,
+  onSave,
+}: VehicleFormDialogProps) {
   const form = useForm<VehicleFormValues>({
     resolver: zodResolver(vehicleSchema),
     defaultValues: {
@@ -100,7 +123,7 @@ export function VehicleFormDialog({ open, onOpenChange, vehicle, onSave }: Vehic
       images: [],
       features: [],
     },
-  })
+  });
 
   useEffect(() => {
     if (vehicle) {
@@ -114,27 +137,27 @@ export function VehicleFormDialog({ open, onOpenChange, vehicle, onSave }: Vehic
         location: vehicle.location || "",
         year: vehicle.year || new Date().getFullYear(),
         mileage: vehicle.mileage || 0,
-        body_type: vehicle.body_type || "",
+        body_type: vehicle.bodyType || "",
         fuel: vehicle.fuel || "",
         transmission: vehicle.transmission || "",
-        environmental_tag: vehicle.environmental_tag || "",
+        environmental_tag: vehicle.environmentalTag || "",
         drivetrain: vehicle.drivetrain || "",
         power: vehicle.power || 0,
-        engine_displacement: vehicle.engine_displacement || 0,
+        engine_displacement: vehicle.engineDisplacement || 0,
         color: vehicle.color || "",
         doors: vehicle.doors || 5,
-        electric_range: vehicle.electric_range || 0,
-        battery_capacity: vehicle.battery_capacity || 0,
-        charging_time: vehicle.charging_time || 0,
-        fast_charge: vehicle.fast_charge || false,
-        charging_port: vehicle.charging_port || "",
-        iva_deductible: vehicle.iva_deductible || false,
-        monthly_price: vehicle.monthly_price || 0,
-        finance_price: vehicle.finance_price || 0,
+        electric_range: vehicle.electricRange || 0,
+        battery_capacity: vehicle.batteryCapacity || 0,
+        charging_time: vehicle.chargingTime || 0,
+        fast_charge: vehicle.fastCharge || false,
+        charging_port: vehicle.chargingPort || "",
+        iva_deductible: vehicle.ivaDeductible || false,
+        monthly_price: vehicle.monthlyPrice || 0,
+        finance_price: vehicle.financePrice || 0,
         description: vehicle.description || "",
         images: vehicle.images || [],
         features: vehicle.features || [],
-      })
+      });
     } else {
       form.reset({
         brand: "",
@@ -165,9 +188,9 @@ export function VehicleFormDialog({ open, onOpenChange, vehicle, onSave }: Vehic
         description: "",
         images: [],
         features: [],
-      })
+      });
     }
-  }, [vehicle, form])
+  }, [vehicle, form]);
 
   const onSubmit = (data: VehicleFormValues) => {
     onSave({
@@ -180,37 +203,40 @@ export function VehicleFormDialog({ open, onOpenChange, vehicle, onSave }: Vehic
       location: data.location,
       year: data.year,
       mileage: data.mileage,
-      body_type: data.body_type,
+      bodyType: data.body_type || "",
       fuel: data.fuel,
-      transmission: data.transmission,
-      environmental_tag: data.environmental_tag,
+      transmission: data.transmission || "",
+      environmentalTag: data.environmental_tag || "",
       drivetrain: data.drivetrain,
       power: data.power,
-      engine_displacement: data.engine_displacement,
+      engineDisplacement: data.engine_displacement,
       color: data.color,
       doors: data.doors,
-      electric_range: data.electric_range,
-      battery_capacity: data.battery_capacity,
-      charging_time: data.charging_time,
-      fast_charge: data.fast_charge,
-      charging_port: data.charging_port,
-      iva_deductible: data.iva_deductible,
-      monthly_price: data.monthly_price,
-      finance_price: data.finance_price,
+      electricRange: data.electric_range,
+      batteryCapacity: data.battery_capacity,
+      chargingTime: data.charging_time,
+      fastCharge: data.fast_charge,
+      chargingPort: data.charging_port,
+      ivaDeductible: data.iva_deductible,
+      monthlyPrice: data.monthly_price,
+      financePrice: data.finance_price,
       description: data.description,
       images: data.images,
       features: data.features,
-    })
-  }
+    });
+  };
 
-  // Determinar si mostrar campos específicos para vehículos eléctricos
-  const showElectricFields = form.watch("fuel") === "Eléctrico" || form.watch("fuel") === "Híbrido enchufable"
+  const showElectricFields =
+    form.watch("fuel") === "Eléctrico" ||
+    form.watch("fuel") === "Híbrido enchufable";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{vehicle ? "Editar Vehículo" : "Añadir Vehículo"}</DialogTitle>
+          <DialogTitle>
+            {vehicle ? "Editar Vehículo" : "Añadir Vehículo"}
+          </DialogTitle>
           <DialogDescription>
             {vehicle
               ? "Modifica los detalles del vehículo y guarda los cambios."
@@ -278,7 +304,11 @@ export function VehicleFormDialog({ open, onOpenChange, vehicle, onSave }: Vehic
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Estado</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          value={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Selecciona un estado" />
@@ -374,7 +404,11 @@ export function VehicleFormDialog({ open, onOpenChange, vehicle, onSave }: Vehic
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Tipo de carrocería</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          value={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Selecciona un tipo" />
@@ -382,12 +416,13 @@ export function VehicleFormDialog({ open, onOpenChange, vehicle, onSave }: Vehic
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="SUV">SUV</SelectItem>
-                            <SelectItem value="Sedán">Sedán</SelectItem>
-                            <SelectItem value="Hatchback">Hatchback</SelectItem>
-                            <SelectItem value="Coupé">Coupé</SelectItem>
-                            <SelectItem value="Cabrio">Cabrio</SelectItem>
+                            <SelectItem value="Berlina">Sedán</SelectItem>
+                            <SelectItem value="Cabrio">Hatchback</SelectItem>
+                            <SelectItem value="Coupe">Coupé</SelectItem>
                             <SelectItem value="Familiar">Familiar</SelectItem>
-                            <SelectItem value="Monovolumen">Monovolumen</SelectItem>
+                            <SelectItem value="Monovolumen">
+                              Monovolumen
+                            </SelectItem>
                             <SelectItem value="Pickup">Pickup</SelectItem>
                           </SelectContent>
                         </Select>
@@ -401,7 +436,11 @@ export function VehicleFormDialog({ open, onOpenChange, vehicle, onSave }: Vehic
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Etiqueta medioambiental</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          value={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Selecciona una etiqueta" />
@@ -431,7 +470,11 @@ export function VehicleFormDialog({ open, onOpenChange, vehicle, onSave }: Vehic
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Combustible</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          value={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Selecciona un tipo" />
@@ -441,7 +484,9 @@ export function VehicleFormDialog({ open, onOpenChange, vehicle, onSave }: Vehic
                             <SelectItem value="Gasolina">Gasolina</SelectItem>
                             <SelectItem value="Diésel">Diésel</SelectItem>
                             <SelectItem value="Híbrido">Híbrido</SelectItem>
-                            <SelectItem value="Híbrido enchufable">Híbrido enchufable</SelectItem>
+                            <SelectItem value="Híbrido enchufable">
+                              Híbrido enchufable
+                            </SelectItem>
                             <SelectItem value="Eléctrico">Eléctrico</SelectItem>
                             <SelectItem value="GLP">GLP</SelectItem>
                             <SelectItem value="GNC">GNC</SelectItem>
@@ -457,7 +502,11 @@ export function VehicleFormDialog({ open, onOpenChange, vehicle, onSave }: Vehic
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Transmisión</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          value={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Selecciona un tipo" />
@@ -465,8 +514,12 @@ export function VehicleFormDialog({ open, onOpenChange, vehicle, onSave }: Vehic
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="Manual">Manual</SelectItem>
-                            <SelectItem value="Automática">Automática</SelectItem>
-                            <SelectItem value="Semiautomática">Semiautomática</SelectItem>
+                            <SelectItem value="Automática">
+                              Automática
+                            </SelectItem>
+                            <SelectItem value="Semiautomática">
+                              Semiautomática
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -479,7 +532,11 @@ export function VehicleFormDialog({ open, onOpenChange, vehicle, onSave }: Vehic
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Tracción</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          value={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Selecciona un tipo" />
@@ -528,7 +585,9 @@ export function VehicleFormDialog({ open, onOpenChange, vehicle, onSave }: Vehic
 
                 {showElectricFields && (
                   <div className="border p-4 rounded-md space-y-4">
-                    <h3 className="font-medium">Información específica para vehículos eléctricos/híbridos</h3>
+                    <h3 className="font-medium">
+                      Información específica para vehículos eléctricos/híbridos
+                    </h3>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
@@ -579,7 +638,11 @@ export function VehicleFormDialog({ open, onOpenChange, vehicle, onSave }: Vehic
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Tipo de conector</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                              value={field.value}
+                            >
                               <FormControl>
                                 <SelectTrigger>
                                   <SelectValue placeholder="Selecciona un tipo" />
@@ -604,11 +667,16 @@ export function VehicleFormDialog({ open, onOpenChange, vehicle, onSave }: Vehic
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                           <FormControl>
-                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
                           </FormControl>
                           <div className="space-y-1 leading-none">
                             <FormLabel>Carga rápida</FormLabel>
-                            <FormDescription>El vehículo dispone de capacidad de carga rápida</FormDescription>
+                            <FormDescription>
+                              El vehículo dispone de capacidad de carga rápida
+                            </FormDescription>
                           </div>
                         </FormItem>
                       )}
@@ -667,11 +735,16 @@ export function VehicleFormDialog({ open, onOpenChange, vehicle, onSave }: Vehic
                   render={({ field }) => (
                     <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                       <FormControl>
-                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
                       </FormControl>
                       <div className="space-y-1 leading-none">
                         <FormLabel>IVA deducible</FormLabel>
-                        <FormDescription>El IVA de este vehículo es deducible para empresas</FormDescription>
+                        <FormDescription>
+                          El IVA de este vehículo es deducible para empresas
+                        </FormDescription>
                       </div>
                     </FormItem>
                   )}
@@ -701,7 +774,11 @@ export function VehicleFormDialog({ open, onOpenChange, vehicle, onSave }: Vehic
             </Tabs>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
                 Cancelar
               </Button>
               <Button type="submit">Guardar</Button>
@@ -710,6 +787,5 @@ export function VehicleFormDialog({ open, onOpenChange, vehicle, onSave }: Vehic
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
-
