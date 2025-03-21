@@ -20,9 +20,9 @@ export default async function CatalogPage({
   const filteredCars = await fetchFilteredCars(params);
   const allCars = await fetchCars();
 
-  if (!filteredCars) {
+/*   if (!filteredCars) {
     return <div>Cargando vehículos...</div>;
-  }
+  } */
   return (
     <CatalogClient
       allCars={allCars}
