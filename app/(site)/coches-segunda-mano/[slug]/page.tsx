@@ -13,7 +13,7 @@ export const revalidate = 60;
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: any;
 }): Promise<Metadata> {
   const paramsResolved = await Promise.resolve(params);
   const { slug } = paramsResolved;
@@ -40,7 +40,7 @@ export async function generateMetadata({
 export default async function CarPage({
   params,
 }: {
-  params: { slug: string };
+  params: any;
 }) {
   const paramsResolved = await Promise.resolve(params);
   const { slug } = paramsResolved;
