@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { DashboardHeader } from "@/components/dashboard/dashboardHeader";
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { fetchFeatures, createFeature, updateFeature, deleteFeature } from "@/supabase/supabase";
 import { useToast } from "@/hooks/useToast";
 import { Feature } from "@/lib/definitions";
-import { FeaturesTable } from "@/components/dashboard/features/featureTable";
-import { FeatureFormDialog } from "@/components/dashboard/features/featureFormDialog";
+import { FeaturesTable } from "@/components/dashboard/features/FeatureTable";
+import { FeatureFormDialog } from "@/components/dashboard/features/FeatureFormDialog";
 
 export default function FeaturesPage() {
   const [features, setFeatures] = useState<Feature[]>([]);

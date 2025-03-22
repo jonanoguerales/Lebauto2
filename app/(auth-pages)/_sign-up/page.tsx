@@ -1,6 +1,6 @@
 import { signUpAction } from "@/lib/actions";
-import { FormMessage, Message } from "@/components/formMessage";
-import { SubmitButton } from "@/components/submitButton";
+import { FormMessage, Message } from "@/components/FormMessage";
+import { SubmitButton } from "@/components/SubmitButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";

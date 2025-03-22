@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import CatalogClient from "@/components/cars/catalogClient";
+import CatalogClient from "@/components/cars/CatalogClient";
 import { fetchFilteredCars } from "@/supabase/fetchFilteredCars";
 import { fetchCars } from "@/supabase/supabase";
 

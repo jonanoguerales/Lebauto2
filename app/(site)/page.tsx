@@ -1,16 +1,16 @@
-import BrandGrid from "@/components/home/brandGrid";
-import ContactButtons from "@/components/contactButtons";
-import CategoriesSection from "@/components/home/categories-section";
-import HeroSection from "@/components/home/hero-section";
-import SearchSection from "@/components/home/search-section";
-import SellYourCarSection from "@/components/home/sellYourCarSection";
+import BrandGrid from "@/components/home/BrandGrid";
+import ContactButtons from "@/components/ContactButtons";
+import CategoriesSection from "@/components/home/CategoriesSection";
+import HeroSection from "@/components/home/HeroSection";
+import SearchSection from "@/components/home/SearchSection";
+import SellYourCarSection from "@/components/home/SellYourCarSection";
 import Link from "next/link";
 import type { Metadata } from "next";
-import ElectricVehiclesSection from "@/components/home/electricVehiclesSection";
-import ElectricChargersSection from "@/components/home/electricShargersSection";
-import WhyElectricSection from "@/components/home/whyElectricSection";
-import SavingsCalculator from "@/components/home/savingsCalculator";
-import SubsidiesSection from "@/components/home/subsidiesSection";
+import ElectricVehiclesSection from "@/components/home/ElectricVehiclesSection";
+import ElectricChargersSection from "@/components/home/ElectricShargersSection";
+import WhyElectricSection from "@/components/home/WhyElectricSection";
+import SavingsCalculator from "@/components/home/SavingsCalculator";
+import SubsidiesSection from "@/components/home/SubsidiesSection";
 
 export const metadata: Metadata = {
   title:

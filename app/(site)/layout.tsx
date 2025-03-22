@@ -1,5 +1,5 @@
-import Footer from "@/components/footer";
-import Navbar from "@/components/nvbar";
+import Footer from "@/components/Footer";
+import Navbar from "@/components/Nvbar";
 import "@/global.css";
 export default async function Layout({
   children,

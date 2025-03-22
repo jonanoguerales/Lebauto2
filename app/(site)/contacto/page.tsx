@@ -1,6 +1,6 @@
-import ContactForm from "@/components/contactForm";
-import Faq from "@/components/faq";
-import Map from "@/components/map";
+import ContactForm from "@/components/ContactForm";
+import Faq from "@/components/FAQ";
+import Map from "@/components/Map";
 import { Button } from "@/components/ui/button";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
 

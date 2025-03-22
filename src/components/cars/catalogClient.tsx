@@ -5,8 +5,8 @@ import { useViewStore, useFilterStore } from "@/lib/store";
 import type { CatalogClientProps } from "@/lib/definitions";
 import { Button } from "@/components/ui/button";
 import { Filter, FilterX, Grid, List } from "lucide-react";
-import CarList from "./carList";
-import CarFilters from "./carFilters";
+import CarList from "./CarList";
+import CarFilters from "./CarFilters";
 import {
   Select,
   SelectTrigger,

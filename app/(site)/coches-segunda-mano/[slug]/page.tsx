@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import CarGallery from "@/components/cars/carGallery";
-import CarInfo from "@/components/cars/carInfo";
-import CarFeatures from "@/components/cars/carFeatures";
-import CarContact from "@/components/cars/carContact";
-import { CarCardSkeleton } from "@/components/cars/carSkeleton";
+import CarGallery from "@/components/cars/CarGallery";
+import CarInfo from "@/components/cars/CarInfo";
+import CarFeatures from "@/components/cars/CarFeatures";
+import CarContact from "@/components/cars/CarContact";
+import { CarCardSkeleton } from "@/components/cars/CarSkeleton";
 import { Suspense } from "react";
 import { fetchCarDetailsBySlug } from "@/supabase/supabase";
 
