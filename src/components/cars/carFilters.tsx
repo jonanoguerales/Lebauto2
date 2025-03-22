@@ -1,19 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import {
-  Car as CarIcon,
-  MapPin,
-  Palette,
-  ChevronDown,
-  ChevronRight,
-  X,
-  Search,
-  Fuel,
-  Gauge,
-  Calendar1,
-  DollarSign,
-} from "lucide-react";
+import { MapPin, Palette, X, Fuel, Gauge, Calendar1 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -28,7 +16,16 @@ import { Input } from "@/components/ui/input";
 import { useFilterStore } from "@/lib/store";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/useToast";
-import { useDebouncedCallback } from "use-debounce";
+import { BrandModelFilter } from "./filters/BrandModelFilter";
+import { PriceFilter } from "./filters/PriceFilter";
+import { usePriceDebounce } from "@/hooks/usePriceDebounce";
+import { useYearDebounce } from "@/hooks/useYearDebounce";
+import { useKmDebounce } from "@/hooks/useKmDebounce";
+import { YearFilter } from "./filters/YearFilter";
+import { KmFilter } from "./filters/KmFilter";
+import { FuelFilter } from "./filters/FuelFilter";
+import { ColorFilter } from "./filters/ColorFilter";
+import { LocationFilter } from "./filters/LocationFilter";
 
 export default function CarFilters({
   isOpen = false,
@@ -157,9 +154,7 @@ export default function CarFilters({
         ? `/coches-segunda-mano?${params.toString()}`
         : "/coches-segunda-mano";
 
-      if (newUrl !== window.location.pathname + window.location.search) {
-        router.replace(newUrl, { scroll: false });
-      }
+      router.replace(newUrl, { scroll: false });
     };
 
     updateUrl();
@@ -353,100 +348,78 @@ export default function CarFilters({
     () => getActiveFilters(),
     [filters, modelsByBrand, uniqueBrands]
   );
-  
-  const debouncedValidateMinPrice = useDebouncedCallback((value: string) => {
-    const numValue = Number(value);
-    if (Number(maxPrice) && numValue > Number(maxPrice)) {
-      toast({
-        title: "Error",
-        description:
-        "El precio mínimo no puede ser mayor que el precio máximo.",
-        variant: "destructive",
-      });
-      setFilter("minPrice", Number(maxPrice));
-      setMinPrice(maxPrice);
-    } else {
-      setFilter("minPrice", numValue || 0);
-    }
-  }, 500);
-  
-  const debouncedValidateMaxPrice = useDebouncedCallback((value: string) => {
-    const numValue = Number(value);
-    if (Number(minPrice) && numValue < Number(minPrice)) {
-      toast({
-        title: "Error",
-        description:
-          "El precio máximo no puede ser menor que el precio mínimo.",
-        variant: "destructive",
-      });
-      setFilter("maxPrice", Number(minPrice));
-      setMaxPrice(minPrice);
-    } else {
-      setFilter("maxPrice", numValue || 1000000);
-    }
-  }, 500);
 
-  const debouncedValidateMaxYear = useDebouncedCallback((value: string) => {
-    const numValue = Number(value);
-    if (Number(minYear) && numValue < Number(minYear)) {
-      toast({
-        title: "Error",
-        description: "El año máximo no puede ser menor que el año mínimo.",
-        variant: "destructive",
-      });
-      setFilter("maxYear", Number(minYear));
-      setMaxYear(minYear);
-    } else {
-      setFilter("maxYear", numValue || new Date().getFullYear());
-    }
-  }, 500);
+  const { debouncedValidateMinPrice, debouncedValidateMaxPrice } =
+    usePriceDebounce({
+      minPrice,
+      maxPrice,
+      setMinPrice,
+      setMaxPrice,
+      setFilter,
+      toast,
+    });
+  const { debouncedValidateMinYear, debouncedValidateMaxYear } =
+    useYearDebounce({
+      minYear,
+      maxYear,
+      setMinYear,
+      setMaxYear,
+      setFilter,
+      toast,
+    });
+  const { debouncedValidateMinKm, debouncedValidateMaxKm } = useKmDebounce({
+    minKm,
+    maxKm,
+    setMinKm,
+    setMaxKm,
+    setFilter,
+    toast,
+  });
 
-  const debouncedValidateMinYear = useDebouncedCallback((value: string) => {
-    const numValue = Number(value);
-    if (Number(maxYear) && numValue > Number(maxYear)) {
-      toast({
-        title: "Error",
-        description: "El año mínimo no puede ser mayor que el año máximo.",
-        variant: "destructive",
-      });
-      setFilter("minYear", Number(maxYear));
-      setMinYear(maxYear);
-    } else {
-      setFilter("minYear", numValue || 1990);
-    }
-  }, 500);
+  const brandModelConfig = {
+    filters,
+    searchTerm,
+    setSearchTerm,
+    displayedBrands,
+    modelsByBrand,
+    expandedBrands,
+    handleBrandClick,
+    lowerSearch,
+    selectAllModelsState,
+    handleSelectAllModels,
+    handleModelChange,
+    filteredBrands,
+    showAllBrands,
+    setShowAllBrands,
+  };
 
-  const debouncedValidateMaxKm = useDebouncedCallback((value: string) => {
-    const numValue = Number(value);
-    if (Number(minKm) && numValue < Number(minKm)) {
-      toast({
-        title: "Error",
-        description:
-          "Los kilómetros máximos no pueden ser menores que los kilómetros mínimos.",
-        variant: "destructive",
-      });
-      setFilter("maxKm", Number(minKm));
-      setMaxKm(minKm);
-    } else {
-      setFilter("maxKm", numValue || 500000);
-    }
-  }, 500);
+  const PriceFilterConfig = {
+    minPrice,
+    setMinPrice,
+    maxPrice,
+    setMaxPrice,
+    debouncedValidateMinPrice,
+    debouncedValidateMaxPrice,
+  };
 
-  const debouncedValidateMinKm = useDebouncedCallback((value: string) => {
-    const numValue = Number(value);
-    if (Number(maxKm) && numValue > Number(maxKm)) {
-      toast({
-        title: "Error",
-        description:
-          "Los kilómetros mínimos no pueden ser mayores que los kilómetros máximos.",
-        variant: "destructive",
-      });
-      setFilter("minKm", Number(maxKm));
-      setMinKm(maxKm);
-    } else {
-      setFilter("minKm", numValue || 0);
-    }
-  }, 500);
+  const YearFilterConfig = {
+    minYear,
+    setMinYear,
+    maxYear,
+    setMaxYear,
+    debouncedValidateMinYear,
+    debouncedValidateMaxYear,
+    currentYear,
+  };
+
+  const KmFilterConfig = {
+    minKm,
+    setMinKm,
+    maxKm,
+    setMaxKm,
+    debouncedValidateMinKm,
+    debouncedValidateMaxKm,
+  };
 
   return (
     <div className="space-y-6 p-6 flex flex-col justify-between h-full">
@@ -496,325 +469,31 @@ export default function CarFilters({
           </div>
         )}
         <Accordion type="multiple" defaultValue={["marca"]}>
-          <AccordionItem value="marca">
-            <AccordionTrigger className="py-3">
-              <div className="flex items-center gap-2">
-                <CarIcon className="h-5 w-5" />
-                <span>Marca y modelo</span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="p-3">
-                <div className="relative mb-4">
-                  <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-                  <Input
-                    placeholder="Buscar marca o modelo..."
-                    className="pl-10 pr-4"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                  {searchTerm && (
-                    <button
-                      onClick={() => setSearchTerm("")}
-                      className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
-                      aria-label="Borrar búsqueda"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  )}
-                </div>
-                <div className="space-y-4 max-h-96 overflow-auto custom-scrollbar">
-                  {displayedBrands.map((brand) => {
-                    const autoExpand =
-                      searchTerm !== "" &&
-                      modelsByBrand[brand].some((model) =>
-                        model.toLowerCase().includes(lowerSearch)
-                      );
-                    const isExpanded =
-                      autoExpand || expandedBrands[brand] || false;
-                    return (
-                      <div key={brand} className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <button
-                            onClick={() => handleBrandClick(brand)}
-                            className="flex items-center space-x-2 font-medium hover:text-primary"
-                          >
-                            {isExpanded ? (
-                              <ChevronDown className="h-4 w-4" />
-                            ) : (
-                              <ChevronRight className="h-4 w-4" />
-                            )}
-                            <span>{brand}</span>
-                          </button>
-                        </div>
-                        {isExpanded && (
-                          <div className="ml-6 space-y-2 border-l-2 pl-4">
-                            <div className="flex items-center space-x-2">
-                              <Checkbox
-                                id={`all-models-${brand}`}
-                                checked={selectAllModelsState[brand] || false}
-                                onCheckedChange={(checked) =>
-                                  handleSelectAllModels(brand, checked === true)
-                                }
-                              />
-                              <Label
-                                htmlFor={`all-models-${brand}`}
-                                className="font-medium"
-                              >
-                                Todos los modelos
-                              </Label>
-                            </div>
-                            {modelsByBrand[brand]?.map((model) => (
-                              <div
-                                key={`${brand}-${model}`}
-                                className="flex items-center space-x-2"
-                              >
-                                <Checkbox
-                                  id={`model-${brand}-${model}`}
-                                  checked={
-                                    filters.model?.includes(model) || false
-                                  }
-                                  onCheckedChange={(checked) =>
-                                    handleModelChange(
-                                      model,
-                                      brand,
-                                      checked === true
-                                    )
-                                  }
-                                />
-                                <Label htmlFor={`model-${brand}-${model}`}>
-                                  {model}
-                                </Label>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-                {filteredBrands.length > 6 && (
-                  <Button
-                    variant="link"
-                    className="mt-4 w-full text-center"
-                    onClick={() => setShowAllBrands(!showAllBrands)}
-                  >
-                    {showAllBrands ? "Ver menos" : "Ver todas las marcas"}
-                  </Button>
-                )}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-          {/* Precio */}
-          <AccordionItem value="precio">
-            <AccordionTrigger className="py-3">
-              <div className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5" />
-                <span>Precio</span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="space-y-4 py-2">
-                <div className="grid grid-cols-2 gap-4 p-1">
-                  <div>
-                    <Label htmlFor="min-price">Mínimo</Label>
-                    <Input
-                      id="min-price"
-                      type="number"
-                      value={minPrice}
-                      onFocus={(e) => e.target.select()}
-                      onChange={(e) => {
-                        setMinPrice(e.target.value);
-                        debouncedValidateMinPrice(e.target.value);
-                      }}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="max-price">Máximo</Label>
-                    <Input
-                      id="max-price"
-                      type="number"
-                      value={maxPrice} // estado local
-                      onFocus={(e) => e.target.select()}
-                      onChange={(e) => {
-                        setMaxPrice(e.target.value);
-                        debouncedValidateMaxPrice(e.target.value);
-                      }}
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
+          <BrandModelFilter config={brandModelConfig} />
 
-          {/* Año */}
-          <AccordionItem value="año">
-            <AccordionTrigger className="py-3">
-              <div className="flex items-center gap-2">
-                <Calendar1 className="h-5 w-5" />
-                <span>Año</span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="space-y-4 py-2">
-                <div className="grid grid-cols-2 gap-4 p-1">
-                  <div>
-                    <Label htmlFor="min-year">Desde</Label>
-                    <Input
-                      id="min-year"
-                      type="number"
-                      max={currentYear}
-                      value={minYear}
-                      onFocus={(e) => e.target.select()}
-                      onChange={(e) => {
-                        setMinYear(e.target.value);
-                        debouncedValidateMinYear(e.target.value);
-                      }}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="max-year">Hasta</Label>
-                    <Input
-                      id="max-year"
-                      type="number"
-                      value={maxYear}
-                      onFocus={(e) => e.target.select()}
-                      onChange={(e) => {
-                        setMaxYear(e.target.value);
-                        debouncedValidateMaxYear(e.target.value);
-                      }}
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
+          <PriceFilter config={PriceFilterConfig} />
 
-          {/* Kilómetros */}
-          <AccordionItem value="km">
-            <AccordionTrigger className="py-3">
-              <div className="flex items-center gap-2">
-                <Gauge className="h-5 w-5" />
-                <span>Kilómetros</span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="space-y-4 py-2">
-                <div className="grid grid-cols-2 gap-4 p-1">
-                  <div>
-                    <Label htmlFor="min-km">Desde</Label>
-                    <Input
-                      id="min-km"
-                      type="number"
-                      value={minKm}
-                      onFocus={(e) => e.target.select()}
-                      onChange={(e) => {
-                        setMinKm(e.target.value);
-                        debouncedValidateMinKm(e.target.value);
-                      }}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="max-km">Hasta</Label>
-                    <Input
-                      id="max-km"
-                      type="number"
-                      value={maxKm}
-                      onFocus={(e) => e.target.select()}
-                      onChange={(e) => {
-                        setMaxKm(e.target.value);
-                        debouncedValidateMaxKm(e.target.value);
-                      }}
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
+          <YearFilter config={YearFilterConfig} />
 
-          {/* Combustible */}
-          <AccordionItem value="combustible">
-            <AccordionTrigger className="py-3">
-              <div className="flex items-center gap-2">
-                <Fuel className="h-5 w-5" />
-                <span>Combustible</span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="space-y-2 py-2">
-                {uniqueFuels.map((fuel) => (
-                  <div key={fuel} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`fuel-${fuel}`}
-                      checked={filters.fuel?.includes(fuel) || false}
-                      onCheckedChange={(checked) =>
-                        handleFuelChange(fuel, checked === true)
-                      }
-                    />
-                    <Label htmlFor={`fuel-${fuel}`}>{fuel}</Label>
-                  </div>
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
+          <KmFilter config={KmFilterConfig} />
 
-          {/* Color */}
-          <AccordionItem value="color">
-            <AccordionTrigger className="py-3">
-              <div className="flex items-center gap-2">
-                <Palette className="h-5 w-5" />
-                <span>Color</span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="space-y-2 py-2">
-                {uniqueColors.map((color) => (
-                  <div key={color} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`color-${color}`}
-                      checked={filters.color?.includes(color) || false}
-                      onCheckedChange={(checked) =>
-                        handleColorChange(color, checked === true)
-                      }
-                    />
-                    <Label htmlFor={`color-${color}`}>{color}</Label>
-                  </div>
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
+          <FuelFilter
+            filters={filters}
+            handleFuelChange={handleFuelChange}
+            uniqueFuels={uniqueFuels}
+          />
 
-          {/* Ubicación */}
-          <AccordionItem value="ubicacion" className="mb-4">
-            <AccordionTrigger className="py-3">
-              <div className="flex items-center gap-2">
-                <MapPin className="h-5 w-5" />
-                <span>Ubicación</span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="space-y-2 py-2">
-                {uniqueLocations.map((location) => (
-                  <div key={location} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`location-${location}`}
-                      checked={filters.location?.includes(location) || false}
-                      onCheckedChange={(checked) =>
-                        handleLocationChange(location, checked === true)
-                      }
-                    />
-                    <Label htmlFor={`location-${location}`}>{location}</Label>
-                  </div>
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
+          <ColorFilter
+            uniqueColors={uniqueColors}
+            filters={filters}
+            handleColorChange={handleColorChange}
+          />
+
+          <LocationFilter
+            uniqueLocations={uniqueLocations}
+            filters={filters}
+            handleLocationChange={handleLocationChange}
+          />
         </Accordion>
       </div>
       <div>

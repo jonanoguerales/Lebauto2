@@ -93,13 +93,13 @@ export interface FiltersData {
 };
 
 // Claves que son array de string
-type ArrayFilterKey = "brand" | "model" | "fuel" | "location" | "color";
+export type ArrayFilterKey = "brand" | "model" | "fuel" | "location" | "color";
 
 // Claves que son numéricas
-type NumberFilterKey = "minPrice" | "maxPrice" | "minYear" | "maxYear" | "minKm" | "maxKm";
+export type NumberFilterKey = "minPrice" | "maxPrice" | "minYear" | "maxYear" | "minKm" | "maxKm";
 
 // Union de todas las claves
-type FilterKey = ArrayFilterKey | NumberFilterKey;
+export type FilterKey = ArrayFilterKey | NumberFilterKey;
 
 export interface FilterStateStore {
   filters: FiltersData;
